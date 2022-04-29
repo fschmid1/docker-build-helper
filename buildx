@@ -68,5 +68,5 @@ else
   fi
 
   echo "Running build with :\"$command $args $second\""
-  # $($command $args $second)
+  $($command $args $second)
 fi
