@@ -1,14 +1,37 @@
 #!/bin/bash
 
+SCRIPT_NAME=$0
+
 push="false"
 buildArm="false"
 arm="false"
+
+
+show_help() {
+  echo
+  echo "Usage: $(basename $SCRIPT_NAME) <path-to-file>/docker-compose.yml"
+  echo
+  echo "  -a|--arm        addes arm64 to platform build target" 
+  echo "  -p|--push       pushes the image to registry (image must be defined in compose file)"
+  echo
+  echo "Examples:"
+  echo
+  echo "  $(basename $SCRIPT_NAME) docker-compose.yml -p (will build and push the x86 images to the registry)"
+  echo "  $(basename $SCRIPT_NAME) docker-compose.yml -p -a (will build and push the x86|arm64 images to the registry)"
+  echo
+
+  exit 0
+}
 
 for a in $@; do
   p=$(echo "$a" | awk '{print tolower($0)}')
   case "$p" in 
     -a) buildArm="true";;
     -p) push="true";;
+    -h) show_help;;
+    --arm) buildArm="true";;
+    --push) push="true";;
+    --help) show_help;;
   esac
 done
 
