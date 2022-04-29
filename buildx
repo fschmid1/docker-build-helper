@@ -79,7 +79,7 @@ else
   second=""
   if [[ $push == "true" ]]; then
     if [[ $buildArm == "true" ]]; then
-      command="docker builx bake -f $1"
+      command="docker buildx bake -f $1"
       args="$args --set *.platform=linux/x86_64,linux/arm/v7 --push"
     else
       command="docker-compose -f $1 build"
