@@ -1,0 +1,72 @@
+#!/bin/bash
+
+push="false"
+buildArm="false"
+arm="false"
+
+for a in $@; do
+  p=$(echo "$a" | awk '{print tolower($0)}')
+  case "$p" in 
+    -a) buildArm="true";;
+    -p) push="true";;
+  esac
+done
+
+if [[ $(uname -m) == "arm64" ]]; then
+  arm="true"
+  echo "Building on arm64 architecture"
+fi
+
+if [[ $arm == "true" ]] && [[ buildArm == "true" ]]; then
+  builders="$(docker buildx ls | grep m1_builder)"
+  if [[ $builders == "" ]]; then
+    echo "No builder found, creating new m1_builder"
+    docker buildx create m1_builder --use --name m1_builder
+  else
+    echo "Using existing m1_builder"
+  fi
+fi
+
+args=""
+
+if [[ $arm == "true" ]]; then
+  if [[ $push == "true" ]]; then
+    if [[ $buildArm == "true" ]]; then
+      args="$args --set *.platform=linux/x86_64,linux/arm/v7 --push"
+    else
+      args="$args --set *.platform=linux/x86_64 --push"
+    fi
+  else 
+    if [[ $buildArm = "true" ]]; then
+      echo "Multiplatform images can only be pushed and not loaded"
+      exit 1
+    else
+      args="$args --set *.platform=linux/x86_64 --load"
+    fi
+  fi
+
+  echo "Running build with :\"docker buildx bake -f $1 $args\""
+  docker buildx bake -f $1 $args
+else 
+  command=""
+  second=""
+  if [[ $push == "true" ]]; then
+    if [[ $buildArm == "true" ]]; then
+      command="docker builx bake -f $1"
+      args="$args --set *.platform=linux/x86_64,linux/arm/v7 --push"
+    else
+      command="docker-compose -f $1 build"
+      second="&& docker-compose -f $1 push"
+    fi
+  else 
+    if [[ $buildArm = "true" ]]; then
+      echo "Multiplatform images can only be pushed and not loaded"
+      exit 1
+    else
+      command="docker-compose -f $1 build"
+    fi
+  fi
+
+  echo "Running build with :\"$command $args $second\""
+  # $($command $args $second)
+fi
