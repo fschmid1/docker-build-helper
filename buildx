@@ -44,11 +44,11 @@ if [[ $(uname -m) == "arm64" ]]; then
   echo "Building on arm64 architecture"
 fi
 
-if [[ $arm == "true" ]] && [[ buildArm == "true" ]]; then
+if [[ $buildArm == "true" ]]; then
   builders="$(docker buildx ls | grep m1_builder)"
   if [[ $builders == "" ]]; then
     echo "No builder found, creating new m1_builder"
-    docker buildx create m1_builder --use --name m1_builder
+    docker buildx create --use --name m1_builder
   else
     echo "Using existing m1_builder"
   fi
