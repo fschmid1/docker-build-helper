@@ -62,7 +62,7 @@ args=""
 if [[ $arm == "true" ]]; then
   if [[ $push == "true" ]]; then
     if [[ $buildArm == "true" ]]; then
-      args="$args --set *.platform=linux/x86_64,linux/arm/v7 --push"
+      args="$args --set *.platform=linux/x86_64,linux/arm/v7,linux/arm64/v8 --push"
     else
       args="$args --set *.platform=linux/x86_64 --push"
     fi
@@ -83,7 +83,7 @@ else
   if [[ $push == "true" ]]; then
     if [[ $buildArm == "true" ]]; then
       command="docker buildx bake -f $1"
-      args="$args --set *.platform=linux/x86_64,linux/arm/v7 --push"
+      args="$args --set *.platform=linux/x86_64,linux/arm/v7,linux/arm64/v8 --push"
     else
       command="docker-compose -f $1 build"
       second="&& docker-compose -f $1 push"
